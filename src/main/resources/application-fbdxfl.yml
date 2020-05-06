@@ -1,0 +1,69 @@
+sharding:
+  jdbc:
+    dataSource:
+      names: db-test0,db-test1,db-test0f,db-test1f,db
+      # 配置主库
+      db-test0: #org.apache.tomcat.jdbc.pool.DataSource
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/cool?useUnicode=true&characterEncoding=utf8&tinyInt1isBit=false&useSSL=false&serverTimezone=GMT
+        username: root
+        password: root
+        #最大连接数
+        maxPoolSize: 20
+      db-test1: # 配置从库
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/cool2?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT
+        username: root
+        password: root
+        maxPoolSize: 20
+      db-test0f: # 配置从库
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.0.7:3306/cool?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT
+        username: root
+        password: wswx_acc
+        maxPoolSize: 20
+      db-test1f: # 配置从库
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.0.7:3306/cool2?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT
+        username: root
+        password: wswx_acc
+        maxPoolSize: 20
+      db: # 配置从库
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/cool?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT
+        username: root
+        password: root
+        maxPoolSize: 20
+    #    config:
+    #      masterslave: # 单独 配置读写分离
+    #        load-balance-algorithm-type: round_robin  # 配置从库选择策略，提供轮询与随机，这里选择用轮询//random 随机 //round_robin 轮询
+    #        name: db1s2
+    props:
+      sql: # 开启SQL显示，默认值: false，注意：仅配置读写分离时不会打印日志！！！
+        show: true
+
+
+    config:
+      sharding:
+        default-data-source-name: db #默认数据源
+#分库的设置
+#sharding.jdbc.config.sharding.default-database-strategy.inline.sharding-column: count
+#sharding.jdbc.config.sharding.default-database-strategy.inline.algorithm-expression: ds_$->{count % 2}
+sharding.jdbc.config.sharding.default-database-strategy.standard.sharding-column: count
+sharding.jdbc.config.sharding.default-database-strategy.standard.precise-algorithm-class-name: com.lsx.shardingtest.config.MyDataBasesPreciseShardingAlgorithm
+
+#sharding.jdbc.config.sharding.default-database-strategy.standard.precise-algorithm-class-name: com.lsx.shardingtest.config.MyDataBasesPreciseShardingAlgorithm
+#分表的设置
+sharding.jdbc.config.sharding.tables.user.actual-data-nodes: ds_$->{0..1}.user_$->{0..3} #表示读取ds_0数据源的user_0、user_1、user_2、user_3。
+sharding.jdbc.config.sharding.tables.user.table-strategy.standard.sharding-column: count #配置的数据分表的字段，
+sharding.jdbc.config.sharding.tables.user.table-strategy.standard.precise-algorithm-class-name: com.lsx.shardingtest.config.MyPreciseShardingAlgorithm #是配置数据分表的策略的类，这里是自定义的类MyPreciseShardingAlgorithm
+
+sharding.jdbc.config.sharding.master-slave-rules.ds_0.master-data-source-name: db-test0 #配置的是主库的数据库名，本案例为db-test0，其中ds_0为分区名。
+sharding.jdbc.config.sharding.master-slave-rules.ds_0.slave-data-source-names: db-test0f #配置的是从库的数据库名
+sharding.jdbc.config.sharding.master-slave-rules.ds_1.master-data-source-name: db-test1 #配置的是主库的数据库名，
+sharding.jdbc.config.sharding.master-slave-rules.ds_1.slave-data-source-names: db-test1f #配置的是从库的数据库名

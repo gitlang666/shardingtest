@@ -1,0 +1,10 @@
+
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: fbdxfl
+mybatis:
+  mapper-locations: classpath:mapper/**.xml
+  #mysqlbinlog.exe --set-charset=utf8 --base64-output=decode-rows -v  e:\mysqllogbin\log-bin.000001 --result-file=e:\mysqllogbin\log.sql

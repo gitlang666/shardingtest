@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lsx.shardingtest.dao.Dao">
+    <update id="maxflag" parameterType="com.lsx.shardingtest.entity.Maxflag">
+
+        update maxflag set count=count+#{maxflag.increment} where name='user';
+        <selectKey keyProperty="maxflag.count" resultType="int" order="AFTER" >
+            select `count` from maxflag where `name`='user'
+        </selectKey>
+    </update>
+    <select id="getUserByPage" resultType="com.lsx.shardingtest.entity.User">
+        select * from user order by count limit #{page},#{num}
+    </select>
+    <insert id="addBatch" parameterType="list">
+        insert into `user`(username,password,`count`) values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.username},#{item.password},#{item.count}
+            )
+        </foreach>
+    </insert>
+
+</mapper>
